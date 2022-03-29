@@ -1,12 +1,27 @@
 import numpy
 import pygame
+import argparse
 
+# instantiate the parser
+parser = argparse.ArgumentParser(description='Specify board dimensions')
+
+# add arguments for rows and cols
+parser.add_argument('rows')
+parser.add_argument('cols')
+
+# collect input rows and cols
+args = parser.parse_args()
+rows = args.rows
+cols = args.cols
+
+# init the pygame library
 pygame.init()
 
 # params for grid dimensions m x n
 m = 5
 n = 5
 
+# setup the grid
 grid = numpy.zeros((m, n))
 
 # Set up the drawing window
@@ -38,4 +53,5 @@ while running:
     pygame.display.flip()
 
 # Done! Time to quit.
+print("Goodbye!")
 pygame.quit()
