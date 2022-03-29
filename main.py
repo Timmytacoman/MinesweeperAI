@@ -2,27 +2,30 @@ import numpy
 import pygame
 import argparse
 
+# default board size
+defaultRows = 10
+defaultCols = 10
+
 # instantiate the parser
-parser = argparse.ArgumentParser(description='Specify board dimensions')
+parser = argparse.ArgumentParser(description='Specify game parameters')
 
 # add arguments for rows and cols
-parser.add_argument('rows')
-parser.add_argument('cols')
+parser.add_argument('--rows', default=defaultRows, help="enter number of rows to be generated")
+parser.add_argument('--cols', default=defaultCols, help="enter number of columns to be generated")
 
 # collect input rows and cols
 args = parser.parse_args()
 rows = args.rows
 cols = args.cols
 
+print(f"Generating board size: {rows} x {cols}")
+exit()
+
 # init the pygame library
 pygame.init()
 
-# params for grid dimensions m x n
-m = 5
-n = 5
-
 # setup the grid
-grid = numpy.zeros((m, n))
+grid = numpy.zeros((rows, cols))
 
 # Set up the drawing window
 screen = pygame.display.set_mode([750, 750])
