@@ -1,3 +1,5 @@
+import math
+
 import numpy
 import pygame
 import argparse
@@ -9,7 +11,6 @@ defaultEdgeSize = 20
 parser = argparse.ArgumentParser(description='Specify game parameters')
 
 # add arguments for rows and cols
-# TODO add screensize argument
 parser.add_argument('--size', type=int, default=defaultEdgeSize, help="enter the size of the board to generate")
 
 # collect input size
@@ -47,6 +48,9 @@ class Tile:
         # this is called when you print a Tile object
         return str(f"x={self.x}\ny={self.y}\ncolor={self.color}")
 
+    def setColor(self, color):
+        self.color = color
+
 
 def init_board():
     # initialize the board
@@ -61,13 +65,38 @@ def init_board():
             x = col * tileLength
             y = row * tileLength
             color = (100, 100, 100)
-            print(Tile(x, y, color))
-
-            # pygame.rect obj takes (left, top, width, height)
-            # pygame.draw.rect(screen, tileBorderColor,
-            #                  pygame.Rect(col * tileLength, row * tileLength, tileLength, tileLength), 2)
+            # create the tile
+            newTile = Tile(x, y, color)
+            # append it to list
+            listOfTiles.append(newTile)
+            pygame.draw.rect(screen, color, pygame.Rect(x, y, tileLength, tileLength), 2)
 
     pygame.display.flip()
+
+
+def draw_board():
+    for tile in listOfTiles:
+        # pygame.rect obj takes (left, top, width, height)
+        # pygame.draw.rect(screen, tile.color, pygame.Rect(tile.x, tile.y, tileLength, tileLength))
+        pass
+    pygame.display.flip()
+
+
+def on_click(x, y):
+    nearestTile = None
+    shortest = tileLength
+    # determine what tile was closest
+    for tile in listOfTiles:
+        # distance formula
+        xDistance = abs(tile.x + (tileLength / 2) - x)
+        yDistance = abs(tile.y + (tileLength / 2) - y)
+        distance = xDistance + yDistance
+        if distance < shortest:
+            shortest = distance
+            nearestTile = tile
+    print(f"nearestTile = \n{nearestTile}")
+    # color the tile
+    nearestTile.setColor((0, 255, 0))
 
 
 # initialize the board
@@ -76,6 +105,8 @@ init_board()
 # Run until the user asks to quit
 running = True
 while running:
+
+    draw_board()
 
     # Did the user click the window close button?
     for event in pygame.event.get():
@@ -86,8 +117,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
             # declare position
             xClick, yClick = pygame.mouse.get_pos()
-
-            print(xClick, yClick)
+            on_click(xClick, yClick)
 
 # Done! Time to quit.
 print("Goodbye!")
