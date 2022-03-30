@@ -5,6 +5,10 @@ import random
 # default board edge size
 defaultEdgeSize = 20
 
+# bomb percentage
+bombPercentage = 20
+numBombs = 0
+
 # instantiate the parser
 parser = argparse.ArgumentParser(description='Specify game parameters')
 
@@ -46,18 +50,20 @@ def getScaledImage(name):
 # image constructing
 tileImage = getScaledImage('tile')
 emptyImage = getScaledImage('empty')
+bombImage = getScaledImage('bomb')
 
 
 class Tile:
-    def __init__(self, x, y, image=None):
+    def __init__(self, x, y, isBomb, image=None):
         # x and y denote the top left position of the tile
         self.x = x
         self.y = y
+        self.isBomb = isBomb
         self.image = image
 
     def __str__(self):
         # this is called when you print a Tile object
-        return str(f"x={self.x}\ny={self.y}")
+        return str(f"x={self.x}\ny={self.y}\nisBomb={self.isBomb}")
 
     def setImage(self, image):
         self.image = image
@@ -72,8 +78,16 @@ def init_board():
             # construct tile obj
             x = col * tileLength
             y = row * tileLength
-            # create the tile
-            newTile = Tile(x, y, tileImage)
+
+            # randomize bombs
+            isBomb = False
+            randNum = random.randint(1, 100)
+            if 1 <= randNum <= bombPercentage:
+                isBomb = True
+                global numBombs
+                numBombs += 1
+            # create tile
+            newTile = Tile(x, y, isBomb, tileImage)
             # append it to list
             listOfTiles.append(newTile)
             # draw tiles
@@ -89,8 +103,9 @@ def draw_board():
 
 
 def on_click(x, y):
-    nearestTile = None
+    clicked_tile = None
     shortest = tileLength
+
     # determine what tile was closest
     for tile in listOfTiles:
         # distance formula
@@ -99,10 +114,16 @@ def on_click(x, y):
         distance = xDistance + yDistance
         if distance < shortest:
             shortest = distance
-            nearestTile = tile
-    # get new image
-    nearestTile.setImage(emptyImage)
-    print(f"nearestTile = \n{nearestTile}")
+            clicked_tile = tile
+
+    # if the clicked tile was a bomb
+    if clicked_tile.isBomb:
+        clicked_tile.setImage(bombImage)
+        return clicked_tile
+
+    # set new image
+    clicked_tile.setImage(emptyImage)
+    return clicked_tile
 
 
 # initialize the board
@@ -110,6 +131,7 @@ init_board()
 
 # Run until the user asks to quit
 running = True
+
 while running:
 
     draw_board()
@@ -123,7 +145,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
             # declare position
             xClick, yClick = pygame.mouse.get_pos()
-            on_click(xClick, yClick)
+            print(on_click(xClick, yClick))
 
 # Done! Time to quit.
 print("Goodbye!")
