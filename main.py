@@ -55,8 +55,9 @@ class Tile:
 def init_board():
     # initialize the board
 
-    # fill the screen white
+    # border color
     screen.fill((255, 255, 255))
+    # screen.fill((0, 0, 0))
 
     # construct all the tiles
     for row in range(size):
@@ -77,8 +78,7 @@ def init_board():
 def draw_board():
     for tile in listOfTiles:
         # pygame.rect obj takes (left, top, width, height)
-        # pygame.draw.rect(screen, tile.color, pygame.Rect(tile.x, tile.y, tileLength, tileLength))
-        pass
+        pygame.draw.rect(screen, tile.color, pygame.Rect(tile.x, tile.y, tileLength, tileLength), 2)
     pygame.display.flip()
 
 
