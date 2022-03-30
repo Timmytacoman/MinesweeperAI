@@ -1,8 +1,6 @@
-import math
-
-import numpy
 import pygame
 import argparse
+import random
 
 # default board edge size
 defaultEdgeSize = 20
@@ -26,6 +24,9 @@ print(f"Screen size: {screenSize}")
 # init the pygame library
 pygame.init()
 
+# set the pygame window name
+pygame.display.set_caption('Minesweeper AI')
+
 # determine tile length
 tileLength = screenSize / size
 print(f"tileLength = {tileLength}")
@@ -37,27 +38,33 @@ screen = pygame.display.set_mode([screenSize, screenSize])
 listOfTiles = []
 
 
+def getScaledImage(name):
+    # returns the scaled image of the desired image
+    return pygame.transform.scale(pygame.image.load(f"./assets/{name}.png"), (tileLength, tileLength))
+
+
+# image constructing
+tileImage = getScaledImage('tile')
+emptyImage = getScaledImage('empty')
+
+
 class Tile:
-    def __init__(self, x, y, color):
+    def __init__(self, x, y, image=None):
         # x and y denote the top left position of the tile
         self.x = x
         self.y = y
-        self.color = color
+        self.image = image
 
     def __str__(self):
         # this is called when you print a Tile object
-        return str(f"x={self.x}\ny={self.y}\ncolor={self.color}")
+        return str(f"x={self.x}\ny={self.y}")
 
-    def setColor(self, color):
-        self.color = color
+    def setImage(self, image):
+        self.image = image
 
 
 def init_board():
     # initialize the board
-
-    # border color
-    screen.fill((255, 255, 255))
-    # screen.fill((0, 0, 0))
 
     # construct all the tiles
     for row in range(size):
@@ -65,20 +72,19 @@ def init_board():
             # construct tile obj
             x = col * tileLength
             y = row * tileLength
-            color = (100, 100, 100)
             # create the tile
-            newTile = Tile(x, y, color)
+            newTile = Tile(x, y, tileImage)
             # append it to list
             listOfTiles.append(newTile)
-            pygame.draw.rect(screen, color, pygame.Rect(x, y, tileLength, tileLength), 2)
+            # draw tiles
+            screen.blit(tileImage, (x, y))
 
     pygame.display.flip()
 
 
 def draw_board():
     for tile in listOfTiles:
-        # pygame.rect obj takes (left, top, width, height)
-        pygame.draw.rect(screen, tile.color, pygame.Rect(tile.x, tile.y, tileLength, tileLength), 2)
+        screen.blit(tile.image, (tile.x, tile.y))
     pygame.display.flip()
 
 
@@ -94,9 +100,9 @@ def on_click(x, y):
         if distance < shortest:
             shortest = distance
             nearestTile = tile
+    # get new image
+    nearestTile.setImage(emptyImage)
     print(f"nearestTile = \n{nearestTile}")
-    # color the tile
-    nearestTile.setColor((0, 255, 0))
 
 
 # initialize the board
