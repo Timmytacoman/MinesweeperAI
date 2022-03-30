@@ -42,7 +42,6 @@ screen = pygame.display.set_mode([screen_size, screen_size])
 list_of_tiles = []
 
 
-
 def getScaledImage(name):
     # returns the scaled image of the desired image
     return pygame.transform.scale(pygame.image.load(f"./assets/{name}.png"), (tile_length, tile_length))
@@ -53,6 +52,15 @@ tile_image = getScaledImage('tile')
 empty_image = getScaledImage('empty')
 bomb_image = getScaledImage('bomb')
 
+one_image = getScaledImage('1')
+two_image = getScaledImage('2')
+three_image = getScaledImage('3')
+four_image = getScaledImage('4')
+five_image = getScaledImage('5')
+six_image = getScaledImage('6')
+seven_image = getScaledImage('7')
+eight_image = getScaledImage('8')
+
 
 class Tile:
     def __init__(self, x, y, is_bomb, image=None):
@@ -61,13 +69,30 @@ class Tile:
         self.y = y
         self.is_bomb = is_bomb
         self.image = image
+        self.bomb_count = None
 
     def __str__(self):
         # this is called when you print a Tile object
-        return str(f"x={self.x}\ny={self.y}\nisBomb={self.is_bomb}")
+        return str(f"x={self.x}\ny={self.y}\nis_bomb={self.is_bomb}")
 
     def set_image(self, image):
         self.image = image
+
+    def set_bomb_count(self, count):
+        self.bomb_count = count
+
+        convert_to_word = {
+            0: empty_image,
+            1: one_image,
+            2: two_image,
+            3: three_image,
+            4: four_image,
+            5: five_image,
+            6: six_image,
+            7: seven_image,
+            8: eight_image
+        }
+        self.image = convert_to_word[count]
 
 
 def init_board():
@@ -92,9 +117,36 @@ def init_board():
             # append it to list
             list_of_tiles.append(new_tile)
             # draw tiles
-            screen.blit(tile_image, (x, y))
+            # screen.blit(tile_image, (x, y))
 
     pygame.display.flip()
+
+
+def process_board():
+    # for every tile we need to pre-process the surrounding tiles
+
+    for tile in list_of_tiles:
+        # if it's already a bomb, we don't care about surrounding values
+        if tile.is_bomb:
+            continue
+        surrounding_bomb_count = 0
+        for row in range(-1, 2):
+            for col in range(-1, 2):
+                # skip checking current spot
+                if row == 0 and col == 0:
+                    continue
+                # collect search coordinates
+                x_search = tile.x + (col * tile_length)
+                y_search = tile.y + (row * tile_length)
+                # find adj tile
+                for t in list_of_tiles:
+                    if (t.x == x_search) and (t.y == y_search):
+                        if t.is_bomb:
+                            surrounding_bomb_count += 1
+                        break
+
+        tile.set_bomb_count(surrounding_bomb_count)
+        print(surrounding_bomb_count)
 
 
 def draw_board():
@@ -129,6 +181,9 @@ def on_click(x, y):
 
 # initialize the board
 init_board()
+
+# process the board
+process_board()
 
 # Run until the user asks to quit
 running = True
