@@ -51,7 +51,7 @@ def getScaledImage(name):
 tile_image = getScaledImage('tile')
 empty_image = getScaledImage('empty')
 bomb_image = getScaledImage('bomb')
-
+flag_image = getScaledImage('flag')
 one_image = getScaledImage('1')
 two_image = getScaledImage('2')
 three_image = getScaledImage('3')
@@ -70,18 +70,18 @@ class Tile:
         self.is_bomb = is_bomb
         self.image = image
         self.bomb_count = None
+        self.is_visited = False
 
     def __str__(self):
         # this is called when you print a Tile object
-        return str(f"x={self.x}\ny={self.y}\nis_bomb={self.is_bomb}")
+        return str(f"x={self.x}\ny={self.y}\nis_bomb={self.is_bomb}\nbomb_count={self.bomb_count}")
 
-    def set_image(self, image):
-        self.image = image
-
-    def set_bomb_count(self, count):
-        self.bomb_count = count
-
+    def set_image(self, image=None):
+        if image is not None:
+            self.image = image
+            return
         convert_to_word = {
+            None: bomb_image,
             0: empty_image,
             1: one_image,
             2: two_image,
@@ -92,7 +92,13 @@ class Tile:
             7: seven_image,
             8: eight_image
         }
-        self.image = convert_to_word[count]
+        self.image = convert_to_word[self.bomb_count]
+
+    def set_bomb_count(self, count):
+        self.bomb_count = count
+
+    def set_visited(self, status):
+        self.is_visited = status
 
 
 def init_board():
@@ -146,7 +152,7 @@ def process_board():
                         break
 
         tile.set_bomb_count(surrounding_bomb_count)
-        print(surrounding_bomb_count)
+        # print(surrounding_bomb_count)
 
 
 def draw_board():
@@ -155,7 +161,7 @@ def draw_board():
     pygame.display.flip()
 
 
-def on_click(x, y):
+def on_left_click(x, y):
     clicked_tile = None
     shortest = tile_length
 
@@ -171,12 +177,84 @@ def on_click(x, y):
 
     # if the clicked tile was a bomb
     if clicked_tile.is_bomb:
-        clicked_tile.set_image(bomb_image)
+        clicked_tile.set_image()
         return clicked_tile
 
-    # set new image
-    clicked_tile.set_image(empty_image)
-    return clicked_tile
+    # if not a bomb, set respective image
+
+    clicked_tile.set_image()
+
+    # find surrounding
+    search_surrounding_tiles(clicked_tile)
+
+
+def on_right_click(x, y):
+    clicked_tile = None
+    shortest = tile_length
+
+    # determine what tile was closest
+    for tile in list_of_tiles:
+        # distance formula
+        x_distance = abs(tile.x + (tile_length / 2) - x)
+        y_distance = abs(tile.y + (tile_length / 2) - y)
+        distance = x_distance + y_distance
+        if distance < shortest:
+            shortest = distance
+            clicked_tile = tile
+
+    clicked_tile.set_image(flag_image)
+
+
+remaining_tiles_to_search = []
+
+count = 0
+
+
+def search_surrounding_tiles(tile):
+    global count
+    print(f"Iteration = {count}")
+    print("Searching from:")
+    print(f"---- \n{tile}\n-----")
+
+    tile.is_visited = True
+
+    for row in range(-1, 2):
+        for col in range(-1, 2):
+            # skip checking current spot
+            if row == 0 and col == 0:
+                continue
+            # collect search coordinates
+            x_search = tile.x + (col * tile_length)
+            y_search = tile.y + (row * tile_length)
+            # find adj tile
+            for t in list_of_tiles:
+                if (t.x == x_search) and (t.y == y_search):
+                    # found adj tile
+
+                    # if its already been visited, continue
+                    if t.is_visited:
+                        continue
+
+                    # if empty tile
+                    if t.bomb_count == 0:
+                        # add tile to list
+                        remaining_tiles_to_search.append(t)
+                        # set tile image to empty
+                        t.set_image()
+
+                        # recurse
+                        search_surrounding_tiles(t)
+
+                    # otherwise, display num
+                    else:
+                        if t.bomb_count is not None:
+                            t.set_image()
+                            print(t)
+                            break
+
+    print(remaining_tiles_to_search)
+
+    count += 1
 
 
 # initialize the board
@@ -199,9 +277,24 @@ while running:
 
         # on mouse click
         if event.type == pygame.MOUSEBUTTONUP:
-            # declare position
-            x_click, y_click = pygame.mouse.get_pos()
-            print(on_click(x_click, y_click))
+
+            click_type = event.button
+
+            print(click_type)
+
+            # left click
+            if click_type == 1:
+                print('1')
+                # declare position
+                x_click, y_click = pygame.mouse.get_pos()
+                print(on_left_click(x_click, y_click))
+
+            # right click
+            if click_type == 3:
+                print('3')
+                # declare position
+                x_click, y_click = pygame.mouse.get_pos()
+                print(on_right_click(x_click, y_click))
 
 # Done! Time to quit.
 print("Goodbye!")
