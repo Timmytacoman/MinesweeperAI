@@ -1,12 +1,18 @@
+import math
+
 import pygame
 import argparse
 import random
+import sys
+import math
+
+sys.setrecursionlimit(1000000)
 
 # default board edge size
 default_edge_size = 20
 
 # bomb percentage
-bomb_percentage = 20
+bomb_percentage = 1
 num_bombs = 0
 
 # instantiate the parser
@@ -20,7 +26,7 @@ args = parser.parse_args()
 size = args.size
 
 # screen dimensions
-screen_size = size * 30
+screen_size = size * 40
 
 print(f"Generating board size: {size}")
 print(f"Screen size: {screen_size}")
@@ -40,6 +46,8 @@ screen = pygame.display.set_mode([screen_size, screen_size])
 
 # global list of all the tile objects
 list_of_tiles = []
+
+list_of_nums = [1, 2, 3, 4, 5, 6, 7, 8]
 
 
 def getScaledImage(name):
@@ -175,17 +183,21 @@ def on_left_click(x, y):
             shortest = distance
             clicked_tile = tile
 
+    clicked_tile.set_image()
+
     # if the clicked tile was a bomb
     if clicked_tile.is_bomb:
-        clicked_tile.set_image()
+        on_death()
         return clicked_tile
 
     # if not a bomb, set respective image
-
-    clicked_tile.set_image()
+    if clicked_tile.bomb_count in list_of_nums:
+        return
 
     # find surrounding
-    search_surrounding_tiles(clicked_tile)
+    if clicked_tile.bomb_count == 0:
+        search_surrounding_tiles(clicked_tile)
+        return
 
 
 def on_right_click(x, y):
@@ -202,7 +214,12 @@ def on_right_click(x, y):
             shortest = distance
             clicked_tile = tile
 
-    clicked_tile.set_image(flag_image)
+    # toggle flags
+    if clicked_tile.image == tile_image or clicked_tile.image == flag_image:
+        if clicked_tile.image == flag_image:
+            clicked_tile.set_image(tile_image)
+        else:
+            clicked_tile.set_image(flag_image)
 
 
 remaining_tiles_to_search = []
@@ -257,6 +274,28 @@ def search_surrounding_tiles(tile):
     count += 1
 
 
+def on_death():
+    print("you died")
+    screen.fill((255, 0, 0))
+    global running
+    running = False
+
+
+def check_win():
+    print("checking win")
+    global running
+    num_cleared_tiles = 0
+    for tile in list_of_tiles:
+        if tile.image is not bomb_image and tile.image is not tile_image and tile.image is not flag_image:
+            num_cleared_tiles += 1
+    print(size * size - num_bombs, num_cleared_tiles)
+    if size * size - num_bombs == num_cleared_tiles:
+        # WIN!
+        print("Winner!")
+        screen.fill((0, 255, 0))
+        running = False
+
+
 # initialize the board
 init_board()
 
@@ -282,20 +321,23 @@ while running:
 
             print(click_type)
 
+            x_click, y_click = pygame.mouse.get_pos()
+
             # left click
             if click_type == 1:
                 print('1')
                 # declare position
-                x_click, y_click = pygame.mouse.get_pos()
                 print(on_left_click(x_click, y_click))
+                check_win()
 
             # right click
             if click_type == 3:
                 print('3')
                 # declare position
-                x_click, y_click = pygame.mouse.get_pos()
                 print(on_right_click(x_click, y_click))
 
 # Done! Time to quit.
+pygame.display.flip()
+pygame.time.delay(2000)
 print("Goodbye!")
 pygame.quit()
