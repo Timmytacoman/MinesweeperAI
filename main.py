@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser(description='Specify game parameters')
 # add arguments for rows and cols
 parser.add_argument('--size', type=int, default=default_edge_size, help="enter the size of the board to generate")
 
+
 # collect input size
 args = parser.parse_args()
 size = args.size
