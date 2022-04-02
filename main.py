@@ -1,5 +1,3 @@
-import math
-
 import pygame
 import argparse
 import random

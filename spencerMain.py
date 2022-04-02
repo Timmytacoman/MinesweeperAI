@@ -1,7 +1,5 @@
 import pygame
 import random
-from tile import Tile
-from board import Board
 
 bombArray = []
 clickedBomb = False
@@ -9,11 +7,29 @@ running = True
 color = (255, 0, 0)
 blankCount = 100
 tileCount = 0
+tileSize = 50
+numberOfRowsAndColumns = 10
+size = 10
 
 # Renders all images
 pygame.init()
 pygame.display.set_caption("Minesweeper")
+isBomb = random.choices((0, 1), (0.9, 0.1))
+screen = pygame.display.set_mode([tileSize * numberOfRowsAndColumns, tileSize * numberOfRowsAndColumns])
 
+
+TILE = pygame.transform.scale(pygame.image.load('./assets/tile.png'), (50, 50))
+EMPTY = pygame.transform.scale(pygame.image.load('./assets/empty.png'), (50, 50))
+BOMB = pygame.transform.scale(pygame.image.load('./assets/bomb.png'), (50, 50))
+FLAG = pygame.transform.scale(pygame.image.load('./assets/flag.png'), (50, 50))
+ONE = pygame.transform.scale(pygame.image.load('./assets/1.png'), (50, 50))
+TWO = pygame.transform.scale(pygame.image.load('./assets/2.png'), (50, 50))
+THREE = pygame.transform.scale(pygame.image.load('./assets/3.png'), (50, 50))
+FOUR = pygame.transform.scale(pygame.image.load('./assets/4.png'), (50, 50))
+FIVE = pygame.transform.scale(pygame.image.load('./assets/5.png'), (50, 50))
+SIX = pygame.transform.scale(pygame.image.load('./assets/6.png'), (50, 50))
+SEVEN = pygame.transform.scale(pygame.image.load('./assets/7.png'), (50, 50))
+EIGHT = pygame.transform.scale(pygame.image.load('./assets/8.png'), (50, 50))
 # Creates a 10 x 10 game board... ONLY 10x10 WORKS!
 
 screen.fill((255, 255, 255))
