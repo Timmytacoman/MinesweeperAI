@@ -46,11 +46,19 @@ def draw_board():
 
     # create a surface object, image is drawn on it.
     image = pygame.image.load(r'assets/tile.png')
+    image = pygame.transform.scale(image, (globals.size_scale, globals.size_scale))
+
+    def get_x_draw(my_tile):
+        return my_tile.col * globals.size_scale
+
+    def get_y_draw(my_tile):
+        return my_tile.row * globals.size_scale
 
     for row in globals.list_of_tiles:
         for current_tile in row:
-            print(current_tile)
-            globals.screen.blit(image, (0, 0))
+            # get the coordinates of top left corner to draw tile image
+            draw_coordinates = get_x_draw(current_tile), get_y_draw(current_tile)
+            globals.screen.blit(image, draw_coordinates)
 
     print("Finish draw_board")
 
