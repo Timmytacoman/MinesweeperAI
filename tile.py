@@ -27,6 +27,8 @@ class Tile:
 def construct_tiles():
     print("Beginning tile construction")
 
+    globals.create_tiles(globals.size)
+
     def randomize_bomb(current_tile):
         # randomize the bomb creation
         rand_num = random.randint(1, 100)

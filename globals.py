@@ -14,6 +14,11 @@ size = 10
 size_scale = 40
 
 # list of tile obj
-list_of_tiles = np.ndarray((size, size), tile.Tile)
+list_of_tiles = None
+
+
+def create_tiles(x):
+    global list_of_tiles
+    list_of_tiles = np.ndarray((x, x), tile.Tile)
 
 # end global variable declarations -----------------
