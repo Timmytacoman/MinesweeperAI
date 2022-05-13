@@ -1,5 +1,5 @@
 import os
-import driver
+import time
 import tile
 import globals
 import pygame
@@ -18,8 +18,6 @@ def count_surrounding_tiles():
                 for y in range(-1, 2):
                     col_to_check = current_tile.col + x
                     row_to_check = current_tile.row + y
-                    print(col_to_check)
-                    print(row_to_check)
                     # ensure that we don't check negative a negative col or row, because
                     # numpy wraps to the end of array
                     if col_to_check < 0 or row_to_check < 0:
@@ -39,6 +37,9 @@ def count_surrounding_tiles():
 
 
 def setup_board():
+    # start the timer
+    globals.start_time = time.time()
+
     globals.screen.fill((185, 185, 185))
     # construct all tiles with chance of bomb
     tile.construct_tiles()
@@ -60,11 +61,13 @@ def draw_board():
     def get_image(my_tile):
         # if bomb
         if my_tile.is_bomb:
-            return "bomb"
+            # bomb is 9
+            return 9
 
         # if empty
         if my_tile.bomb_count == 0:
-            return "empty"
+            # empty is 10
+            return 10
 
         # otherwise, get count
         return my_tile.bomb_count
@@ -73,16 +76,14 @@ def draw_board():
         for current_tile in row:
             # get the pygame image to display
             image_type = get_image(current_tile)
-            image_name = f"assets/{image_type}.png"
-            py_image = pygame.image.load(image_name)
-            py_image = pygame.transform.scale(py_image, (globals.size_scale, globals.size_scale))
+            py_image = globals.display_images[image_type]
 
             # get the coordinates of top left corner to draw tile image
             draw_coordinates = get_x_draw(current_tile), get_y_draw(current_tile)
             globals.screen.blit(py_image, draw_coordinates)
-            print(current_tile)
 
     print("Finish draw_board")
+    print(f"Total elapsed board time: {time.time() - globals.start_time}")
 
 
 if __name__ == '__main__':
