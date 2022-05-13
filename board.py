@@ -18,6 +18,12 @@ def count_surrounding_tiles():
                 for y in range(-1, 2):
                     col_to_check = current_tile.col + x
                     row_to_check = current_tile.row + y
+                    print(col_to_check)
+                    print(row_to_check)
+                    # ensure that we don't check negative a negative col or row, because
+                    # numpy wraps to the end of array
+                    if col_to_check < 0 or row_to_check < 0:
+                        continue
                     try:
                         tile_to_check = globals.list_of_tiles[row_to_check][col_to_check]
                         # increment bomb count if it is a bomb
@@ -33,6 +39,7 @@ def count_surrounding_tiles():
 
 
 def setup_board():
+    globals.screen.fill((185, 185, 185))
     # construct all tiles with chance of bomb
     tile.construct_tiles()
     # determine surrounding bomb counts
@@ -44,21 +51,36 @@ def setup_board():
 def draw_board():
     print("Beginning draw_board")
 
-    # create a surface object, image is drawn on it.
-    image = pygame.image.load(r'assets/tile.png')
-    image = pygame.transform.scale(image, (globals.size_scale, globals.size_scale))
-
     def get_x_draw(my_tile):
         return my_tile.col * globals.size_scale
 
     def get_y_draw(my_tile):
         return my_tile.row * globals.size_scale
 
+    def get_image(my_tile):
+        # if bomb
+        if my_tile.is_bomb:
+            return "bomb"
+
+        # if empty
+        if my_tile.bomb_count == 0:
+            return "empty"
+
+        # otherwise, get count
+        return my_tile.bomb_count
+
     for row in globals.list_of_tiles:
         for current_tile in row:
+            # get the pygame image to display
+            image_type = get_image(current_tile)
+            image_name = f"assets/{image_type}.png"
+            py_image = pygame.image.load(image_name)
+            py_image = pygame.transform.scale(py_image, (globals.size_scale, globals.size_scale))
+
             # get the coordinates of top left corner to draw tile image
             draw_coordinates = get_x_draw(current_tile), get_y_draw(current_tile)
-            globals.screen.blit(image, draw_coordinates)
+            globals.screen.blit(py_image, draw_coordinates)
+            print(current_tile)
 
     print("Finish draw_board")
 
