@@ -50,8 +50,6 @@ def setup_board():
 
 
 def draw_board():
-    print("Beginning draw_board")
-
     def get_x_draw(my_tile):
         return my_tile.col * globals.size_scale
 
@@ -81,9 +79,6 @@ def draw_board():
             # get the coordinates of top left corner to draw tile image
             draw_coordinates = get_x_draw(current_tile), get_y_draw(current_tile)
             globals.screen.blit(py_image, draw_coordinates)
-
-    print("Finish draw_board")
-    print(f"Total elapsed board time: {time.time() - globals.start_time}")
 
 
 if __name__ == '__main__':

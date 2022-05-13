@@ -1,5 +1,6 @@
 import globals
 import board
+import listener
 import tile
 import os
 import pygame
@@ -62,11 +63,14 @@ def game_loop():
 
                 # left click
                 if click_type == 1:
-                    pass
+                    listener.left_click()
 
                 # right click
                 if click_type == 3:
-                    pass
+                    listener.right_click()
+
+                # draw the board
+                board.draw_board()
 
     # Quit
     pygame.quit()
